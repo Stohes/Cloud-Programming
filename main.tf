@@ -4,7 +4,7 @@ provider "aws" {
 
 # S3 Bucket for Elastic Beanstalk app version storage
 resource "aws_s3_bucket" "app_bucket" {
-  bucket = "${var.app_name}-bucket-IUBH-Cloud-Programming"
+  bucket = "${var.app_name}-bucket-iubh-cloud-programming"
 }
 
 # Upload the application version (app.zip) to S3
