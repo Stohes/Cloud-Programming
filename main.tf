@@ -69,6 +69,9 @@ resource "aws_elastic_beanstalk_environment" "streamlit_env" {
   application         = aws_elastic_beanstalk_application.streamlit_app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.3.2 running Python 3.12"
 
+  # Link the application version to the environment
+  version_label = aws_elastic_beanstalk_application_version.streamlit_app_version.name
+
   # Disable IMDSv1 (use only IMDSv2)
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
