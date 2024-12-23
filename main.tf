@@ -28,6 +28,40 @@ resource "aws_elastic_beanstalk_application_version" "streamlit_app_version" {
   key         = aws_s3_object.app_version.key
 }
 
+# Create an IAM role for Elastic Beanstalk EC2 instances
+resource "aws_iam_role" "eb_instance_role" {
+  name               = "${var.app_name}-instance-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+# Attach the default Elastic Beanstalk policies to the role
+resource "aws_iam_role_policy_attachment" "eb_instance_role_managed" {
+  role       = aws_iam_role.eb_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier"
+}
+
+resource "aws_iam_role_policy_attachment" "eb_instance_role_cloudwatch" {
+  role       = aws_iam_role.eb_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
+# Create an instance profile for the IAM role
+resource "aws_iam_instance_profile" "eb_instance_profile" {
+  name = "${var.app_name}-instance-profile"
+  role = aws_iam_role.eb_instance_role.name
+}
+
 # Elastic Beanstalk Environment
 resource "aws_elastic_beanstalk_environment" "streamlit_env" {
   name                = "${var.app_name}-env"
@@ -48,6 +82,14 @@ resource "aws_elastic_beanstalk_environment" "streamlit_env" {
     value     = "t2.micro"
   }
 
+  # Set IAM role
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "IamInstanceProfile"
+    value     = aws_iam_instance_profile.eb_instance_profile.name
+  }
+
+  # Set Streamlit default port
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "PORT"
