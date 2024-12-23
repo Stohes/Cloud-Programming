@@ -32,5 +32,5 @@ resource "aws_elastic_beanstalk_application_version" "streamlit_app_version" {
 resource "aws_elastic_beanstalk_environment" "streamlit_env" {
   name                = "${var.app_name}-env"
   application         = aws_elastic_beanstalk_application.streamlit_app.name
-  solution_stack_name = "64bit Amazon Linux 2023 v4.2.0 running Python 3.12"
+  solution_stack_name = "64bit Amazon Linux 2023 v4.3.2 running Python 3.12"
 }
