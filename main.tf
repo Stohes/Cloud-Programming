@@ -51,6 +51,7 @@ resource "aws_iam_role_policy_attachment" "eb_instance_role_managed" {
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier"
 }
 
+# Use spot instances
 resource "aws_iam_role_policy_attachment" "eb_instance_role_cloudwatch" {
   role       = aws_iam_role.eb_instance_role.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
@@ -67,6 +68,20 @@ resource "aws_elastic_beanstalk_environment" "streamlit_env" {
   name                = "${var.app_name}-env"
   application         = aws_elastic_beanstalk_application.streamlit_app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.3.2 running Python 3.12"
+
+  # Disable IMDSv1 (use only IMDSv2)
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "DisableIMDSv1"
+    value     = "true"
+  }
+
+  # Set root volume type to gp3
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "RootVolumeType"
+    value     = "gp3"
+  }
 
   # Set Elastic Beanstalk to use a single instance
   setting {
