@@ -34,3 +34,9 @@ resource "aws_elastic_beanstalk_environment" "streamlit_env" {
   application         = aws_elastic_beanstalk_application.streamlit_app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.3.2 running Python 3.12"
 }
+
+
+# Output block to print the Elastic Beanstalk environment URL after deployment
+output "app_url" {
+  value = aws_elastic_beanstalk_environment.streamlit_env.endpoint_url
+}
