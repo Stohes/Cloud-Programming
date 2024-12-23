@@ -34,6 +34,20 @@ resource "aws_elastic_beanstalk_environment" "streamlit_env" {
   application         = aws_elastic_beanstalk_application.streamlit_app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.3.2 running Python 3.12"
 
+  # Set Elastic Beanstalk to use a single instance
+  setting {
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "EnvironmentType"
+    value     = "SingleInstance"
+  }
+
+  # Ensure the instance type is Free Tier eligible
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "InstanceType"
+    value     = "t2.micro"
+  }
+
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "PORT"
